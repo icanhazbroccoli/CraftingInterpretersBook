@@ -1,4 +1,4 @@
-package io.whitebox;
+package io.whitebox.lox;
 
 public class Token {
   final TokenType type;

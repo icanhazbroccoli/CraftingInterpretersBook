@@ -1,11 +1,11 @@
-package io.whitebox;
+package io.whitebox.lox;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.whitebox.TokenType.*;
+import static io.whitebox.lox.TokenType.*;
 
 public class Scanner {
   private final String source;
@@ -14,6 +14,11 @@ public class Scanner {
   private int current = 0;
   private int line = 1;
   private static final Map<String, TokenType> keywords;
+
+  enum CommentStyle {
+    SINGLELINE,
+    MULTILINE
+  }
 
   static {
     keywords = new HashMap<>();
@@ -99,7 +104,9 @@ public class Scanner {
         break;
       case '/':
         if (match('/')) {
-          while (peek() != '\n' && isAtEnd()) advance();
+          comment(CommentStyle.SINGLELINE);
+        } else if (match('*')) {
+          comment(CommentStyle.MULTILINE);
         } else {
           addToken(SLASH);
         }
@@ -120,9 +127,8 @@ public class Scanner {
         } else if (isAlpha(c)) {
           identifier();
         } else {
-          Lox.error(line, "Unexpected character.");
+          Lox.error(line, "Unexpected character: " + c);
         }
-        Lox.error(line, "Unexpected character.");
         break;
     }
   }
@@ -156,6 +162,23 @@ public class Scanner {
     advance();
     String value = source.substring(start + 1, current - 1);
     addToken(STRING, value);
+  }
+
+  private void comment(CommentStyle style) {
+    switch (style) {
+      case SINGLELINE:
+        while (peek() != '\n' && !isAtEnd()) advance();
+        break;
+      case MULTILINE:
+        while (peek() != '*' && peekNext() != '/' && !isAtEnd()) advance();
+        if (isAtEnd() && !(match('*') && match('/'))) {
+          Lox.error(line, "Unterminated multiline comment.");
+          return;
+        }
+        advance();
+        advance();
+        break;
+    }
   }
 
   private boolean match(char expected) {

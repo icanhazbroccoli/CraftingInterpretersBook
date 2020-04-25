@@ -1,4 +1,4 @@
-package io.whitebox;
+package io.whitebox.lox;
 
 public enum TokenType {
   LEFT_PAREN,

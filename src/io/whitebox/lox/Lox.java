@@ -1,4 +1,4 @@
-package io.whitebox;
+package io.whitebox.lox;
 
 import java.io.BufferedReader;
 import java.io.IOException;
