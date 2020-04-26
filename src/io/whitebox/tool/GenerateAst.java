@@ -19,7 +19,8 @@ public class GenerateAst {
             "Binary: Expr left, Token operator, Expr right",
             "Grouping: Expr expression",
             "Literal: Object value",
-            "Unary: Token operator, Expr right"));
+            "Unary: Token operator, Expr right",
+            "Ternary: Expr condition, Expr left, Expr right"));
   }
 
   private static void defineAst(String outputDir, String baseName, List<String> types)
@@ -63,6 +64,7 @@ public class GenerateAst {
 
   private static void defineType(
       PrintWriter writer, String baseName, String className, String fieldList) {
+    writer.println();
     writer.println("  static class " + className + " extends " + baseName + " {");
     writer.println("    " + className + "(" + fieldList + ") {");
     String[] fields = fieldList.split(", ");
@@ -83,6 +85,5 @@ public class GenerateAst {
       writer.println("    final " + field + ";");
     }
     writer.println("  }");
-
   }
 }

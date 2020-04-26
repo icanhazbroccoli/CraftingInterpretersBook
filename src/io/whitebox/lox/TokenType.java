@@ -9,6 +9,8 @@ public enum TokenType {
   DOT,
   MINUS,
   PLUS,
+  QUESTION,
+  COLON,
   SEMICOLON,
   SLASH,
   STAR,
@@ -43,5 +45,6 @@ public enum TokenType {
   VAR,
   WHILE,
 
+  ILLEGAL,
   EOF
 }

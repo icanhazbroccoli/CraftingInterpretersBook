@@ -84,6 +84,12 @@ public class Scanner {
       case '+':
         addToken(PLUS);
         break;
+      case '?':
+        addToken(QUESTION);
+        break;
+      case ':':
+        addToken(COLON);
+        break;
       case ';':
         addToken(SEMICOLON);
         break;
@@ -127,7 +133,7 @@ public class Scanner {
         } else if (isAlpha(c)) {
           identifier();
         } else {
-          Lox.error(line, "Unexpected character: " + c);
+          Lox.error(new Token(ILLEGAL, "", null, line), "Unexpected character: " + c);
         }
         break;
     }
@@ -156,7 +162,7 @@ public class Scanner {
       advance();
     }
     if (isAtEnd()) {
-      Lox.error(line, "Unterminated string.");
+      Lox.error(new Token(ILLEGAL, "", null, line), "Unterminated string.");
       return;
     }
     advance();
@@ -172,7 +178,7 @@ public class Scanner {
       case MULTILINE:
         while (peek() != '*' && peekNext() != '/' && !isAtEnd()) advance();
         if (isAtEnd() && !(match('*') && match('/'))) {
-          Lox.error(line, "Unterminated multiline comment.");
+          Lox.error(new Token(ILLEGAL, "", null, line), "Unterminated multiline comment.");
           return;
         }
         advance();
