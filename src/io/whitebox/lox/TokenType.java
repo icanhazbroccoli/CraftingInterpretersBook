@@ -29,6 +29,7 @@ public enum TokenType {
   NUMBER,
 
   AND,
+  BREAK,
   CLASS,
   ELSE,
   FALSE,

@@ -20,6 +20,7 @@ public class GenerateAst {
             "Binary   : Expr left, Token operator, Expr right",
             "Grouping : Expr expression",
             "Literal  : Object value",
+            "Logical  : Expr left, Token operator, Expr right",
             "Unary    : Token operator, Expr right",
             "Ternary  : Expr condition, Expr left, Expr right",
             "Variable : Token name"));
@@ -28,9 +29,12 @@ public class GenerateAst {
         "Stmt",
         Arrays.asList(
             "Block      : List<Stmt> statements",
+            "Break      : ",
             "Expression : Expr expression",
+            "If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
             "Print      : Expr expression",
-            "Var        : Token name, Expr initializer"));
+            "Var        : Token name, Expr initializer",
+            "While      : Expr condition, Stmt body"));
   }
 
   private static void defineAst(String outputDir, String baseName, List<String> types)
@@ -75,14 +79,23 @@ public class GenerateAst {
   private static void defineType(
       PrintWriter writer, String baseName, String className, String fieldList) {
     writer.println();
+
     writer.println("  static class " + className + " extends " + baseName + " {");
-    writer.println("    " + className + "(" + fieldList + ") {");
-    String[] fields = fieldList.split(", ");
-    for (String field : fields) {
-      String name = field.split(" ")[1];
-      writer.println("      this." + name + " = " + name + ";");
+
+    //String[] fields = fieldList.split(", ");
+    String[] fields = new String[]{};
+    if (fieldList.length() > 0) {
+      fields = fieldList.split(", ");
     }
-    writer.println("    }");
+
+    if (fields.length > 0) {
+      writer.println("    " + className + "(" + fieldList + ") {");
+      for (String field : fields) {
+        String name = field.split(" ")[1];
+        writer.println("      this." + name + " = " + name + ";");
+      }
+      writer.println("    }");
+    }
 
     writer.println();
     writer.println("    @Override");
@@ -90,10 +103,13 @@ public class GenerateAst {
     writer.println("      return visitor.visit" + className + baseName + "(this);");
     writer.println("    }");
 
-    writer.println();
-    for (String field : fields) {
-      writer.println("    final " + field + ";");
+    if (fields.length > 0) {
+      writer.println();
+      for (String field : fields) {
+        writer.println("    final " + field + ";");
+      }
     }
+
     writer.println("  }");
   }
 }
