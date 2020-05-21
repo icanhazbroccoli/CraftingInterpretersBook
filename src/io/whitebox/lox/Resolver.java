@@ -8,6 +8,7 @@ import java.util.Stack;
 public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
   private final Interpreter interpreter;
   private final Stack<Map<String, Boolean>> scopes = new Stack<>();
+  private int loopCounter = 0;
   private FunctionType currentFunction = FunctionType.NONE;
 
   Resolver(Interpreter interpreter) {
@@ -35,6 +36,9 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
   @Override
   public Void visitBreakStmt(Stmt.Break stmt) {
+    if (loopCounter == 0) {
+      Lox.error(stmt.keyword, "Cannot break from non-loop context.");
+    }
     return null;
   }
 
@@ -91,8 +95,10 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
   @Override
   public Void visitWhileStmt(Stmt.While stmt) {
+    beginLoop();
     resolve(stmt.condition);
     resolve(stmt.body);
+    endLoop();
     return null;
   }
 
@@ -187,6 +193,14 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     scopes.pop();
   }
 
+  private void beginLoop() {
+    loopCounter++;
+  }
+
+  private void endLoop() {
+    loopCounter--;
+  }
+
   private void declare(Token name) {
     if (scopes.isEmpty()) {
       return;
@@ -206,7 +220,7 @@ public class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
   }
 
   private void resolveLocal(Expr expr, Token name) {
-    for (int i = scopes.size(); i >= 0; i--) {
+    for (int i = scopes.size() - 1; i >= 0; i--) {
       if (scopes.get(i).containsKey(name.lexeme)) {
         interpreter.resolve(expr, scopes.size() - 1 - i);
         return;

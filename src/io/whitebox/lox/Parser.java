@@ -89,8 +89,9 @@ public class Parser {
   }
 
   private Stmt breakStatement() {
+    Token keyword = previous();
     consume(SEMICOLON, "Expect ';' after break");
-    return new Stmt.Break();
+    return new Stmt.Break(keyword);
   }
 
   private Stmt ifStatement() {
